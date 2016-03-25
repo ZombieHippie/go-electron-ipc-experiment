@@ -1,5 +1,4 @@
 'use strict';
-
 const electron = require('electron');
 // Module to control application life.
 const app = electron.app;
@@ -11,14 +10,62 @@ const BrowserWindow = electron.BrowserWindow;
 let mainWindow;
 
 function createWindow () {
+
+  // In main process.
+  const ipcMain = require('electron').ipcMain;
+
+  let sender = null
+  let size = {W: 800, H: 600, midX: 400, midY: 300 }
+
+  ipcMain.on('set-dimensions', function(event, args) {
+    console.log('set-dimensions', args)
+    size.W = args.W; size.H = args.H;
+    size.midX = args.midX; size.midY = args.midY;
+  })
+
+  var i = 0
+  var di = 0
+  var ai = 0.1
+  var getI = function () {
+    i = di + i
+    di = ai + di
+    if (Math.abs(di) > 5) ai = -1 * ai
+    return i
+  }
+  ipcMain.on('set-sender', function(event, args) {
+    console.log('set-sender', args)
+    sender = event.sender
+    setTimeout(function () {
+      setInterval(function () {
+        var i = getI()
+        if(i === 0) i += di * 0.01
+        sender.send('draws', [
+          ['background', i%255],
+          ['fill', 12, 255, (256-i)%255],
+          ['rect', 50, 50, 50 * i, 50 * i],
+          ['fill', (256-i)%255, 12, 255],
+          [
+            'quad',
+            size.midX / 10 * i + 20,  10,
+            10,                   size.H / i + i * 5,
+            0,                    size.H,
+            i * 5 + 12,          (size.H - 8 * i) % size.H,
+            size.W - 60 * i,     i * 50
+          ]
+        ])
+      }, 20)
+    }, 200)
+  })
+
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600});
+
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools();
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/index.html');
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {

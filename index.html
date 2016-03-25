@@ -3,11 +3,21 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+    <style>
+    #defaultCanvas0{
+      position:absolute;
+      left:0;top:0;
+      width:100% !important;height:100% !important;
+      z-index:-1;
+    }
+    </style>
   </head>
   <body>
     <h1>Hello World!</h1>
+    <pre id="test"></pre>
     We are using node <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
-  </body>
+<script src="assets/test-2.js"></script>
+</body>
 </html>
