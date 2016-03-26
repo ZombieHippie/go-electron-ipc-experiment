@@ -15,7 +15,7 @@ function createWindow () {
   const ipcMain = require('electron').ipcMain;
 
   let sender = null
-  let size = {W: 800, H: 600, midX: 400, midY: 300 }
+  let size = {W: 1200, H: 600, midX: 600, midY: 300 }
 
   ipcMain.on('set-dimensions', function(event, args) {
     console.log('set-dimensions', args)
@@ -58,10 +58,10 @@ function createWindow () {
   })
 
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  mainWindow = new BrowserWindow({ width: size.W, height: size.H });
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/index.html');

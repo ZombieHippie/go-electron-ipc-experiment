@@ -4,7 +4,10 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron main.js"
+    "build": "go build -o go-build/main.exe  -buildmode exe ./go-src/main.go",
+    "build-start": "npm-run-all -s build start",
+    "start": "electron src/main.js",
+    "watch": "nodemon --ext go,js,html --watch src --watch test --exec npm run build-start -s"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,7 @@
     "electron-prebuilt": "^0.36.0"
   },
   "dependencies": {
-    "color": "^0.11.1"
+    "color": "^0.11.1",
+    "npm-run-all": "^1.6.0"
   }
 }
