@@ -22,7 +22,7 @@ function createWindow () {
     size.W = args.W; size.H = args.H;
     size.midX = args.midX; size.midY = args.midY;
   })
-
+  var interval1 = null
   var i = 0
   var di = 0
   var ai = 0.1
@@ -36,7 +36,7 @@ function createWindow () {
     console.log('set-sender', args)
     sender = event.sender
     setTimeout(function () {
-      setInterval(function () {
+      interval1 = setInterval(function () {
         var i = getI()
         if(i === 0) i += di * 0.01
         sender.send('draws', [
@@ -73,6 +73,7 @@ function createWindow () {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
+    clearInterval(interval1)
   });
 }
 

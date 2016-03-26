@@ -7,7 +7,7 @@
     "build": "go build -o go-build/main.exe  -buildmode exe ./go-src/main.go",
     "build-start": "npm-run-all -s build start",
     "start": "electron src/main.js",
-    "watch": "nodemon --ext go,js,html --watch src --watch test --exec npm run build-start -s"
+    "watch": "nodemon --ext go,js,html --watch src --watch go-src --exec npm run build-start -s"
   },
   "repository": {
     "type": "git",

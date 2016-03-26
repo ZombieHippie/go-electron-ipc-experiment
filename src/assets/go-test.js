@@ -1,36 +1,27 @@
-
-const spawn = require('child_process').spawn
-
 const path = require('path')
-
 const cmd = path.resolve(__dirname, '../go-build/main')
-
-var main = spawn(cmd)
-
-function Uint8ToString (u8a) {
-  var CHUNK_SZ = 0x8000;
-  var c = [];
-  for (var i=0; i < u8a.length; i+=CHUNK_SZ) {
-    c.push(String.fromCharCode.apply(null, u8a.subarray(i, i+CHUNK_SZ)));
-  }
-  return c.join("");
-}
-
-
-main.stdout.on('data', (data) => {
-  console.log("Go Received", Uint8ToString(data))
-})
-
-main.stderr.on('data', (data) => {
-  console.error("Go Error", Uint8ToString(data))
-})
-
-main.on('close', (code) => {
-  console.error("Go Closed", Uint8ToString(data))
-})
+const GoCx = require('./assets/go-cx')
+const goCx = new GoCx(cmd)
 
 var i = 0
+var interval1 = null
+goCx.on('data', (data) => {
+  console.log('goCx data', data)
+})
+goCx.on('error', (data) => {
+  console.error('goCx error', data)
+})
+goCx.on('close', (code) => {
+  console.log('goCx closed with code:', code)
+  clearInterval(interval1)
+})
 
-setInterval(function () {
-  main.stdin.write(JSON.stringify({ i: i, a: [i, i] }) + '\n')
+interval1 = setInterval(function () {
+  goCx.request('multiply', {it: i, by: 4}, (res) => {
+    console.log("goCx multiply response", res)
+  })
+  i++
+  if (i > 5) {
+    clearInterval(interval1)
+  }
 }, 1000)
