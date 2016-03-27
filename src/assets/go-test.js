@@ -17,7 +17,7 @@ goCx.on('close', (code) => {
 })
 
 interval1 = setInterval(function () {
-  goCx.request('multiply', {it: i, by: 4}, (res) => {
+  goCx.request('multiply', {It: i, By: 4}, (res) => {
     console.log("goCx multiply response", res)
   })
   i++
