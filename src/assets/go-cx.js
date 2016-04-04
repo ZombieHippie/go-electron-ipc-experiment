@@ -1,27 +1,33 @@
 const EventEmitter = require('events')
 const util = require('util')
 
-function Uint8ToString (u8a) {
-  var CHUNK_SZ = 0x8000;
-  var c = [];
-  for (var i=0; i < u8a.length; i+=CHUNK_SZ) {
-    c.push(String.fromCharCode.apply(null, u8a.subarray(i, i+CHUNK_SZ)));
-  }
-  return c.join("");
-}
-
 function createMessageId () {
   return Math.random().toString(36).slice(1,10)
 }
 
+const protobufs = require('./protobufs')
+window.protobufs = protobufs
+
+console.log(protobufs)
+window.buf1 = protobufs.math.MathOperation.encode({
+  id: "awd",
+  left_hand_side: 12,
+  right_hand_side: 412,
+  operation: protobufs.math.MathOperation_MULTIPLY
+})
+
+console.log(buf1, buf1.length)
+
+window.dec1 = protobufs.math.MathOperation.decode(buf1)
+console.log(dec1)
+
+
 const spawn = require('child_process').spawn
 
-const protobufs = require('./protobufs')
-console.log(protobufs)
-
-function GoCx(cmd) {
+function GoCx(cx_cmd, service_cmd) {
   EventEmitter.call(this)
-  const main = spawn(cmd)
+  const main = spawn(cx_cmd)
+  const service = spawn(service_cmd)
 
   main.on('message', (message, sendHandle) => {
     console.log('on message', message, sendHandle)
@@ -54,7 +60,7 @@ function GoCx(cmd) {
 
 GoCx.prototype.request = function (cmd, data, callback) {
   var id = createMessageId()
-
+  return
   if (cmd == 'multiply') {
     var buf = protobufs.math.MathOperation.encode({
       id: id,

@@ -1,14 +1,18 @@
 {
   "name": "electron-quick-start",
+  "private": true,
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "build": "go build -o go-build/main.exe  -buildmode exe ./go-src/main.go",
-    "build-start": "npm-run-all -s proto-build build start",
+    "build-proto": "protoc ./mathoperation/mathoperation.proto --go_out=plugins=grpc:.",
+    "build-go": "npm-run-all -p build-1 build-2",
+    "build-1": "go build -o go-build/service.exe  -buildmode exe ./go-src/service/main.go",
+    "build-2": "go build -o go-build/communication.exe  -buildmode exe ./go-src/communication/main.go",
+    "build": "npm-run-all -s build-proto build-go",
+    "build-start": "npm-run-all -s build start",
     "start": "electron src/main.js",
-    "watch": "nodemon --ext go,js,html,proto --watch src --watch go-src --watch protobuf-src --exec npm run build-start -s",
-    "proto-build": "protoc -I=./protobuf-src/ --go_out=./protobuf-build protobuf-src/go-search-request.proto protobuf-src/math-operation.proto"
+    "watch": "nodemon --ext go,js,html,proto --watch src --watch go-src --watch protobuf-src --exec npm run build-start -s"
   },
   "repository": {
     "type": "git",
@@ -31,8 +35,8 @@
   },
   "dependencies": {
     "color": "^0.11.1",
+    "nodemon": "^1.9.1",
     "npm-run-all": "^1.6.0",
-    "protobufjs": "^5.0.1",
     "protocol-buffers": "^3.1.6"
   }
 }

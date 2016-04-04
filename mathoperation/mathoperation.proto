@@ -1,5 +1,11 @@
 syntax = "proto3";
-package tutorial;
+package mathoperation;
+
+// The calculator service definition
+service Calculator {
+  // Computes the value
+  rpc Compute (MathOperation) returns (MathResult) {}
+}
 
 message MathOperation {
   string id = 1;
