@@ -5,9 +5,10 @@
   "main": "main.js",
   "scripts": {
     "build": "go build -o go-build/main.exe  -buildmode exe ./go-src/main.go",
-    "build-start": "npm-run-all -s build start",
+    "build-start": "npm-run-all -s proto-build build start",
     "start": "electron src/main.js",
-    "watch": "nodemon --ext go,js,html --watch src --watch go-src --exec npm run build-start -s"
+    "watch": "nodemon --ext go,js,html,proto --watch src --watch go-src --watch protobuf-src --exec npm run build-start -s",
+    "proto-build": "protoc -I=./protobuf-src/ --go_out=./protobuf-build protobuf-src/go-search-request.proto protobuf-src/math-operation.proto"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,8 @@
   },
   "dependencies": {
     "color": "^0.11.1",
-    "npm-run-all": "^1.6.0"
+    "npm-run-all": "^1.6.0",
+    "protobufjs": "^5.0.1",
+    "protocol-buffers": "^3.1.6"
   }
 }

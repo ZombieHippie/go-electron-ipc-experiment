@@ -1,0 +1,22 @@
+syntax = "proto3";
+package tutorial;
+
+message SearchRequest {
+  string id = 1;
+  string query = 2;
+  int32 page_number = 3;
+  int32 result_per_page = 4;
+}
+
+message SearchResult {
+  string title = 1;
+  string file = 2;
+  int32 line = 3;
+  int32 col = 4;
+  int32 offset = 5;
+}
+
+message SearchResults {
+  string id = 1;
+  repeated SearchResult results = 2;
+}

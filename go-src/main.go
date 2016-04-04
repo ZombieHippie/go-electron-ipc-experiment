@@ -1,102 +1,74 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
-    "os"
-    "encoding/json"
-    "reflect"
-    "errors"
-    // "strings"
+	"bufio"
+	"fmt"
+	"os"
+
+	"github.com/golang/protobuf/proto"
+	pb "github.com/ZombieHippie/go-electron-ipc-experiment/protobuf-build"
 )
 
-type response struct {
-    ResponseID  string      `json:"id"`
-    Data        interface{} `json:"data"`
+func compute(op *pb.MathOperation) *pb.MathResult {
+	lhs := op.LeftHandSide
+	rhs := op.RightHandSide
+	var res float32
+	var err string
+	switch op.Operation {
+	case pb.MathOperation_ADD:
+		res = lhs + rhs
+	case pb.MathOperation_SUBTRACT:
+		res = lhs - rhs
+	case pb.MathOperation_MULTIPLY:
+		res = lhs * rhs
+	case pb.MathOperation_DIVIDE:
+		if rhs == 0 {
+			err = "Cannot divide by zero"
+		} else {
+			res = lhs / rhs
+		}
+	default:
+		err = "Unknown OperationType"
+	}
+	return &pb.MathResult{
+		Id: op.Id,
+		Result: res,
+		Error: err,
+	}
 }
 
-type request struct {
-    Command     string      `json:"cmd"`
-    ResponseID  string      `json:"id"`
-    Data        interface{} `json:"data"`
-}
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	writer := bufio.NewWriter(os.Stdout)
+	errorWriter := bufio.NewWriter(os.Stderr)
 
-type multiplyData struct {
-    By      float64
-    It      float64
-}
 
-func setField(obj interface{}, name string, value interface{}) error {
-    structValue := reflect.ValueOf(obj).Elem()
-    structFieldValue := structValue.FieldByName(name)
+	//fmt.Println("Ping")
+	for scanner.Scan() {
+		// Always of form [ cmd: string, id: string, data: {}interface ]
+		reqt := &pb.MathOperation{}
+		src := scanner.Bytes()
+		if len(src) == 0 {
+			continue
+		}
+		fmt.Println("src",src)
+		if err := proto.Unmarshal(src, reqt); err != nil {
+			fmt.Fprintln(errorWriter, "Error marshalling", err)
+		}
+		fmt.Println("reqt",reqt)
+		res := compute(reqt)
+		out, err := proto.Marshal(res)
 
-    if !structFieldValue.IsValid() {
-        return fmt.Errorf("No such field: %s in obj\n", name)
-    }
-
-    if !structFieldValue.CanSet() {
-        return fmt.Errorf("Cannot set %s field value\n", name)
-    }
-
-    structFieldType := structFieldValue.Type()
-    val := reflect.ValueOf(value)
-    if structFieldType != val.Type() {
-        return errors.New("Provided value type didn't match obj field type")
-    }
-
-    structFieldValue.Set(val)
-    return nil
-}
-
-func (s *multiplyData) FillStruct(m map[string]interface{}) error {
-    for k, v := range m {
-        err := setField(s, k, v)
-        if err != nil {
-            return err
-        }
-    }
-    return nil
-}
-
-func main () {
-    scanner := bufio.NewScanner(os.Stdin)
-    writer := bufio.NewWriter(os.Stdout)
-    fmt.Println("Ping")
-    for scanner.Scan() {
-        // Always of form [ cmd: string, id: string, data: {}interface ]
-        src := scanner.Bytes()
-        var req request
-        // Here's the actual decoding, and a check for
-        // associated errors.
-        if err := json.Unmarshal(src, &req); err != nil {
-            panic(err)
-        }
-        var slcD response
-        if req.Command == "multiply" {
-            data, ok := req.Data.(map[string]interface{})
-            if ok {
-                result := &multiplyData{}
-                err := result.FillStruct(data)
-                if err != nil {
-                    slcD = response{
-                        req.ResponseID,
-                        err.Error(),
-                    }
-                } else {
-                    slcD = response{
-                        req.ResponseID,
-                        result.It * result.By,
-                    }
-                }
-            } else {
-                slcD = response{req.ResponseID, nil}
-            }
-        } else {
-            slcD = response{req.ResponseID, req.Data}
-        }
-        slcB, _ := json.Marshal(slcD)
-        writer.Write(slcB)
-        writer.WriteRune('\n')
-        writer.Flush()
-    }
+		fmt.Println("out",out)
+		if err != nil {
+			msg := fmt.Sprintln("Failed to encode math result", err)
+			errorWriter.WriteString(msg)
+			errorWriter.WriteRune('\n')
+			errorWriter.Flush()
+		} else {
+			writer.Write(out)
+			writer.WriteRune('\n')
+			writer.Flush()
+		}
+	}
 }

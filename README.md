@@ -12,6 +12,10 @@ A basic Electron application needs just these files:
 
 You can learn more about each of these components within the [Quick Start Guide](http://electron.atom.io/docs/latest/tutorial/quick-start).
 
+## Native Prerequisites
+
+- **Node-protobuf** Building on windows requires you to [build protobuf in 64bits](https://github.com/fuwaneko/node-protobuf/tree/5ce7c5709fe0cce8679c9468d4e274e9243a4e95#windows) using the [Protobuf Cmake instructions](https://github.com/google/protobuf/tree/64dfb5f80a4c09ebf09d7f5c2bf0655c840e690b/cmake) https://cmake.org/download/
+
 ## To Use
 
 To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:

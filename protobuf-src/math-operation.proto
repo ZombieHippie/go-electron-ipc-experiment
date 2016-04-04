@@ -1,0 +1,21 @@
+syntax = "proto3";
+package tutorial;
+
+message MathOperation {
+  string id = 1;
+  float left_hand_side = 2;
+  float right_hand_side = 3;
+  enum OperationType {
+    MULTIPLY = 0;
+    DIVIDE = 1;
+    ADD = 2;
+    SUBTRACT = 3;
+  }
+  OperationType operation = 4;
+}
+
+message MathResult {
+  string id = 1;
+  float result = 2;
+  string error = 3;
+}

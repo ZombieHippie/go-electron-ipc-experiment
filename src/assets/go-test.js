@@ -5,8 +5,8 @@ const goCx = new GoCx(cmd)
 
 var i = 0
 var interval1 = null
-goCx.on('data', (data) => {
-  console.log('goCx data', data)
+goCx.on('message', (message) => {
+  console.log('goCx message', message)
 })
 goCx.on('error', (data) => {
   console.error('goCx error', data)
